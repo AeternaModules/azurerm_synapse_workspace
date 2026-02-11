@@ -48,13 +48,13 @@ EOT
     name                                 = string
     resource_group_name                  = string
     storage_data_lake_gen2_filesystem_id = string
-    azuread_authentication_only          = optional(bool, false)
+    azuread_authentication_only          = optional(bool) # Default: false
     compute_subnet_id                    = optional(string)
     data_exfiltration_protection_enabled = optional(bool)
     linking_allowed_for_aad_tenant_ids   = optional(list(string))
     managed_resource_group_name          = optional(string)
     managed_virtual_network_enabled      = optional(bool)
-    public_network_access_enabled        = optional(bool, true)
+    public_network_access_enabled        = optional(bool) # Default: true
     purview_id                           = optional(string)
     sql_administrator_login              = optional(string)
     sql_administrator_login_password     = optional(string)
@@ -70,7 +70,7 @@ EOT
       tenant_id       = optional(string)
     }))
     customer_managed_key = optional(object({
-      key_name                  = optional(string, "cmk")
+      key_name                  = optional(string) # Default: "cmk"
       key_versionless_id        = string
       user_assigned_identity_id = optional(string)
     }))
