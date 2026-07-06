@@ -87,5 +87,169 @@ EOT
       type         = string
     }))
   }))
+  validation {
+    condition = alltrue([
+      for k, v in var.synapse_workspaces : (
+        v.azure_devops_repo == null || (length(v.azure_devops_repo.account_name) > 0)
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.synapse_workspaces : (
+        v.azure_devops_repo == null || (length(v.azure_devops_repo.branch_name) > 0)
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.synapse_workspaces : (
+        v.azure_devops_repo == null || (v.azure_devops_repo.last_commit_id == null || (length(v.azure_devops_repo.last_commit_id) > 0))
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.synapse_workspaces : (
+        v.azure_devops_repo == null || (length(v.azure_devops_repo.project_name) > 0)
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.synapse_workspaces : (
+        v.azure_devops_repo == null || (length(v.azure_devops_repo.repository_name) > 0)
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.synapse_workspaces : (
+        v.azure_devops_repo == null || (v.azure_devops_repo.tenant_id == null || (can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", v.azure_devops_repo.tenant_id))))
+      )
+    ])
+    error_message = "must be a valid UUID"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.synapse_workspaces : (
+        v.github_repo == null || (length(v.github_repo.account_name) > 0)
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.synapse_workspaces : (
+        v.github_repo == null || (length(v.github_repo.branch_name) > 0)
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.synapse_workspaces : (
+        v.github_repo == null || (v.github_repo.last_commit_id == null || (length(v.github_repo.last_commit_id) > 0))
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.synapse_workspaces : (
+        v.github_repo == null || (length(v.github_repo.repository_name) > 0)
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  # --- Unconfirmed validation candidates, derived from azurerm_synapse_workspace's provider source ---
+  # Not auto-enabled: either a bespoke provider validator we can't safely translate,
+  # or a path that crosses a list-typed block (needs its own for_each wrapping).
+  # Review, translate into a real validation{} block above, and delete once confirmed.
+  # path: name
+  #   source:    [from validate.WorkspaceName] !ok
+  # path: name
+  #   source:    [from validate.WorkspaceName] !regexp.MustCompile(`^[a-z0-9]([a-z0-9-]{0,48}[a-z0-9])?$`).MatchString(v)
+  # path: name
+  #   source:    [from validate.WorkspaceName] strings.Contains(v, "-ondemand")
+  # path: resource_group_name
+  #   condition: length(value) <= 90
+  #   message:   [from resourcegroups.ValidateName: invalid when len(value) > 90]
+  #   source:    [from resourcegroups.ValidateName: invalid when len(value) > 90]
+  # path: resource_group_name
+  #   condition: !endswith(value, ".")
+  #   message:   [from resourcegroups.ValidateName: must not end with "."]
+  #   source:    [from resourcegroups.ValidateName: must not end with "."]
+  # path: resource_group_name
+  #   condition: length(value) != 0
+  #   message:   [from resourcegroups.ValidateName: invalid when len(value) == 0]
+  #   source:    [from resourcegroups.ValidateName: invalid when len(value) == 0]
+  # path: resource_group_name
+  #   source:    [from resourcegroups.ValidateName] !matched
+  # path: location
+  #   source:    location.EnhancedValidate: no recognizable `if ... { errors = append(...) }` pattern - read it by hand
+  # path: storage_data_lake_gen2_filesystem_id
+  #   source:    validation.IsURLWithPath(...) - no translation rule yet, add one
+  # path: sql_administrator_login
+  #   source:    [from validate.SqlAdministratorLoginName] !ok
+  # path: sql_administrator_login
+  #   source:    [from validate.SqlAdministratorLoginName] !regexp.MustCompile(`^[a-zA-Z][a-zA-Z\d-]{0,127}$`).MatchString(v)
+  # path: compute_subnet_id
+  #   source:    [from commonids.ValidateSubnetID] !ok
+  # path: compute_subnet_id
+  #   source:    [from commonids.ValidateSubnetID] err != nil
+  # path: identity.type
+  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: identity.identity_ids[*]
+  #   source:    [from commonids.ValidateUserAssignedIdentityID] !ok
+  # path: identity.identity_ids[*]
+  #   source:    [from commonids.ValidateUserAssignedIdentityID] err != nil
+  # path: managed_resource_group_name
+  #   condition: length(value) <= 90
+  #   message:   [from resourcegroups.ValidateName: invalid when len(value) > 90]
+  #   source:    [from resourcegroups.ValidateName: invalid when len(value) > 90]
+  # path: managed_resource_group_name
+  #   condition: !endswith(value, ".")
+  #   message:   [from resourcegroups.ValidateName: must not end with "."]
+  #   source:    [from resourcegroups.ValidateName: must not end with "."]
+  # path: managed_resource_group_name
+  #   condition: length(value) != 0
+  #   message:   [from resourcegroups.ValidateName: invalid when len(value) == 0]
+  #   source:    [from resourcegroups.ValidateName: invalid when len(value) == 0]
+  # path: managed_resource_group_name
+  #   source:    [from resourcegroups.ValidateName] !matched
+  # path: azure_devops_repo.root_folder
+  #   source:    validate.RepoRootFolder: no recognizable `if ... { errors = append(...) }` pattern - read it by hand
+  # path: github_repo.git_url
+  #   source:    validation.IsURLWithHTTPS(...) - no translation rule yet, add one
+  # path: github_repo.root_folder
+  #   source:    validate.RepoRootFolder: no recognizable `if ... { errors = append(...) }` pattern - read it by hand
+  # path: purview_id
+  #   source:    [from account.ValidateAccountID] !ok
+  # path: purview_id
+  #   source:    [from account.ValidateAccountID] err != nil
+  # path: customer_managed_key.key_versionless_id
+  #   source:    [from keyvault.ValidateNestedItemID] !ok
+  # path: customer_managed_key.key_versionless_id
+  #   source:    [from keyvault.ValidateNestedItemID] err != nil
+  # path: tags
+  #   condition: length(value) <= 50
+  #   message:   [from tags.Validate: invalid when len(value) > 50]
+  #   source:    [from tags.Validate: invalid when len(value) > 50]
+  # path: tags
+  #   condition: length(value) <= 512
+  #   message:   [from tags.Validate: invalid when len(value) > 512]
+  #   source:    [from tags.Validate: invalid when len(value) > 512]
+  # path: tags
+  #   source:    [from tags.Validate] err != nil
+  # path: tags
+  #   condition: length(value) <= 256
+  #   message:   [from tags.Validate: invalid when len(value) > 256]
+  #   source:    [from tags.Validate: invalid when len(value) > 256]
 }
 
