@@ -1,3 +1,8 @@
+data "azurerm_key_vault_secret" "sql_administrator_login_password" {
+  for_each     = { for k, v in var.synapse_workspaces : k => v if v.sql_administrator_login_password_key_vault_id != null && v.sql_administrator_login_password_key_vault_secret_name != null }
+  name         = each.value.sql_administrator_login_password_key_vault_secret_name
+  key_vault_id = each.value.sql_administrator_login_password_key_vault_id
+}
 resource "azurerm_synapse_workspace" "synapse_workspaces" {
   for_each = var.synapse_workspaces
 
@@ -14,7 +19,7 @@ resource "azurerm_synapse_workspace" "synapse_workspaces" {
   public_network_access_enabled        = each.value.public_network_access_enabled
   purview_id                           = each.value.purview_id
   sql_administrator_login              = each.value.sql_administrator_login
-  sql_administrator_login_password     = each.value.sql_administrator_login_password
+  sql_administrator_login_password     = each.value.sql_administrator_login_password != null ? each.value.sql_administrator_login_password : try(data.azurerm_key_vault_secret.sql_administrator_login_password[each.key].value, null)
   sql_identity_control_enabled         = each.value.sql_identity_control_enabled
   tags                                 = each.value.tags
 
