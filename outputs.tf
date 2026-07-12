@@ -1,3 +1,7 @@
+output "synapse_workspaces_id" {
+  description = "Map of id values across all synapse_workspaces, keyed the same as var.synapse_workspaces"
+  value       = { for k, v in azurerm_synapse_workspace.synapse_workspaces : k => v.id }
+}
 output "synapse_workspaces_azure_devops_repo" {
   description = "Map of azure_devops_repo values across all synapse_workspaces, keyed the same as var.synapse_workspaces"
   value       = { for k, v in azurerm_synapse_workspace.synapse_workspaces : k => v.azure_devops_repo }
