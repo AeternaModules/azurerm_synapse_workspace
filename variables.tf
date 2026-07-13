@@ -50,13 +50,13 @@ EOT
     name                                                   = string
     resource_group_name                                    = string
     storage_data_lake_gen2_filesystem_id                   = string
-    azuread_authentication_only                            = optional(bool) # Default: false
+    azuread_authentication_only                            = optional(bool)
     compute_subnet_id                                      = optional(string)
     data_exfiltration_protection_enabled                   = optional(bool)
     linking_allowed_for_aad_tenant_ids                     = optional(list(string))
     managed_resource_group_name                            = optional(string)
     managed_virtual_network_enabled                        = optional(bool)
-    public_network_access_enabled                          = optional(bool) # Default: true
+    public_network_access_enabled                          = optional(bool)
     purview_id                                             = optional(string)
     sql_administrator_login                                = optional(string)
     sql_administrator_login_password                       = optional(string)
@@ -74,7 +74,7 @@ EOT
       tenant_id       = optional(string)
     }))
     customer_managed_key = optional(object({
-      key_name                  = optional(string) # Default: "cmk"
+      key_name                  = optional(string)
       key_versionless_id        = string
       user_assigned_identity_id = optional(string)
     }))
@@ -91,86 +91,6 @@ EOT
       type         = string
     }))
   }))
-  validation {
-    condition = alltrue([
-      for k, v in var.synapse_workspaces : (
-        v.azure_devops_repo == null || (length(v.azure_devops_repo.account_name) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.synapse_workspaces : (
-        v.azure_devops_repo == null || (length(v.azure_devops_repo.branch_name) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.synapse_workspaces : (
-        v.azure_devops_repo == null || (v.azure_devops_repo.last_commit_id == null || (length(v.azure_devops_repo.last_commit_id) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.synapse_workspaces : (
-        v.azure_devops_repo == null || (length(v.azure_devops_repo.project_name) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.synapse_workspaces : (
-        v.azure_devops_repo == null || (length(v.azure_devops_repo.repository_name) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.synapse_workspaces : (
-        v.azure_devops_repo == null || (v.azure_devops_repo.tenant_id == null || (can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", v.azure_devops_repo.tenant_id))))
-      )
-    ])
-    error_message = "must be a valid UUID"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.synapse_workspaces : (
-        v.github_repo == null || (length(v.github_repo.account_name) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.synapse_workspaces : (
-        v.github_repo == null || (length(v.github_repo.branch_name) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.synapse_workspaces : (
-        v.github_repo == null || (v.github_repo.last_commit_id == null || (length(v.github_repo.last_commit_id) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.synapse_workspaces : (
-        v.github_repo == null || (length(v.github_repo.repository_name) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
   # --- Unconfirmed validation candidates, derived from azurerm_synapse_workspace's provider source ---
   # Not auto-enabled: either a bespoke provider validator we can't safely translate,
   # or a path that crosses a list-typed block (needs its own for_each wrapping).
@@ -227,10 +147,40 @@ EOT
   #   source:    [from resourcegroups.ValidateName: invalid when len(value) == 0]
   # path: managed_resource_group_name
   #   source:    [from resourcegroups.ValidateName] !matched
+  # path: azure_devops_repo.account_name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: azure_devops_repo.branch_name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: azure_devops_repo.last_commit_id
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: azure_devops_repo.project_name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: azure_devops_repo.repository_name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: azure_devops_repo.root_folder
   #   source:    validate.RepoRootFolder: no recognizable `if ... { errors = append(...) }` pattern - read it by hand
+  # path: azure_devops_repo.tenant_id
+  #   condition: can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", value))
+  #   message:   must be a valid UUID
+  # path: github_repo.account_name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: github_repo.branch_name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: github_repo.git_url
   #   source:    validation.IsURLWithHTTPS(...) - no translation rule yet, add one
+  # path: github_repo.last_commit_id
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: github_repo.repository_name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: github_repo.root_folder
   #   source:    validate.RepoRootFolder: no recognizable `if ... { errors = append(...) }` pattern - read it by hand
   # path: purview_id
