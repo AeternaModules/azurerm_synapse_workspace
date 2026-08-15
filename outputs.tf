@@ -4,7 +4,7 @@ output "synapse_workspaces_id" {
 }
 output "synapse_workspaces_azure_devops_repo" {
   description = "Map of azure_devops_repo values across all synapse_workspaces, keyed the same as var.synapse_workspaces"
-  value       = { for k, v in azurerm_synapse_workspace.synapse_workspaces : k => v.azure_devops_repo if v.azure_devops_repo != null && length(v.azure_devops_repo) > 0 }
+  value       = { for k, v in azurerm_synapse_workspace.synapse_workspaces : k => one(v.azure_devops_repo) if v.azure_devops_repo != null && length(v.azure_devops_repo) > 0 }
 }
 output "synapse_workspaces_azuread_authentication_only" {
   description = "Map of azuread_authentication_only values across all synapse_workspaces, keyed the same as var.synapse_workspaces"
@@ -20,7 +20,7 @@ output "synapse_workspaces_connectivity_endpoints" {
 }
 output "synapse_workspaces_customer_managed_key" {
   description = "Map of customer_managed_key values across all synapse_workspaces, keyed the same as var.synapse_workspaces"
-  value       = { for k, v in azurerm_synapse_workspace.synapse_workspaces : k => v.customer_managed_key if v.customer_managed_key != null && length(v.customer_managed_key) > 0 }
+  value       = { for k, v in azurerm_synapse_workspace.synapse_workspaces : k => one(v.customer_managed_key) if v.customer_managed_key != null && length(v.customer_managed_key) > 0 }
 }
 output "synapse_workspaces_data_exfiltration_protection_enabled" {
   description = "Map of data_exfiltration_protection_enabled values across all synapse_workspaces, keyed the same as var.synapse_workspaces"
@@ -28,11 +28,11 @@ output "synapse_workspaces_data_exfiltration_protection_enabled" {
 }
 output "synapse_workspaces_github_repo" {
   description = "Map of github_repo values across all synapse_workspaces, keyed the same as var.synapse_workspaces"
-  value       = { for k, v in azurerm_synapse_workspace.synapse_workspaces : k => v.github_repo if v.github_repo != null && length(v.github_repo) > 0 }
+  value       = { for k, v in azurerm_synapse_workspace.synapse_workspaces : k => one(v.github_repo) if v.github_repo != null && length(v.github_repo) > 0 }
 }
 output "synapse_workspaces_identity" {
   description = "Map of identity values across all synapse_workspaces, keyed the same as var.synapse_workspaces"
-  value       = { for k, v in azurerm_synapse_workspace.synapse_workspaces : k => v.identity if v.identity != null && length(v.identity) > 0 }
+  value       = { for k, v in azurerm_synapse_workspace.synapse_workspaces : k => one(v.identity) if v.identity != null && length(v.identity) > 0 }
 }
 output "synapse_workspaces_linking_allowed_for_aad_tenant_ids" {
   description = "Map of linking_allowed_for_aad_tenant_ids values across all synapse_workspaces, keyed the same as var.synapse_workspaces"
